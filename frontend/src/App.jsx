@@ -1,59 +1,279 @@
 import { useState, useEffect } from 'react';
+import AuthForm from './components/AuthForm';
+import UserManagement from './components/UserManagement';
+import RecordManagement from './components/RecordManagement';
+import FrontPage from './components/FrontPage';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [posts, setPosts] = useState([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-
-  // Mock login (replace with real auth later)
-  const login = () => setUser({ username: 'admin' });
-  const logout = () => setUser(null);
+  const [error, setError] = useState('');
+  const [users, setUsers] = useState([]);
+  const [editingPost, setEditingPost] = useState(null);
+  const [designSettings, setDesignSettings] = useState(null);
 
   // Fetch posts from API
+  const fetchPosts = () => {
+    fetch('http://localhost:3001/api/posts', {
+      headers: { token: user.token },
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch posts');
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setPosts(data);
+        } else {
+          setPosts([]);
+          setError('Unexpected response format while fetching posts');
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching posts:', err);
+        setError('Error fetching posts: ' + err.message);
+        setPosts([]);
+      });
+  };
+
+  // Fetch design settings
+  const fetchDesignSettings = () => {
+    fetch('http://localhost:3001/api/design', {
+      headers: { token: user.token },
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch design settings');
+        }
+        return res.json();
+      })
+      .then(data => setDesignSettings(data))
+      .catch(err => {
+        console.error('Error fetching design settings:', err);
+        setError('Error fetching design settings: ' + err.message);
+      });
+  };
+
   useEffect(() => {
     if (user) {
-      fetch('http://localhost:3001/api/posts')
-        .then(res => res.json())
-        .then(data => setPosts(data))
-        .catch(err => console.error('Error fetching posts:', err));
+      fetchPosts();
+      fetchDesignSettings();
     }
   }, [user]);
+
+  // Fetch users for admin (if user is admin)
+  useEffect(() => {
+    if (user && user.role === 'admin') {
+      fetch('http://localhost:3001/api/users', {
+        headers: { token: user.token },
+      })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Failed to fetch users');
+          }
+          return res.json();
+        })
+        .then(data => {
+          if (Array.isArray(data)) {
+            setUsers(data);
+          } else {
+            setUsers([]);
+            setError('Unexpected response format while fetching users');
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching users:', err);
+          setError('Error fetching users: ' + err.message);
+          setUsers([]);
+        });
+    }
+  }, [user]);
+
+  // Handle login
+  const handleLogin = (data) => {
+    setUser(data);
+    localStorage.setItem('user', JSON.stringify(data));
+  };
+
+  // Handle logout
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    setPosts([]);
+    setUsers([]);
+    setError('');
+    setEditingPost(null);
+    setDesignSettings(null);
+  };
 
   // Handle post creation
   const handleCreatePost = async (e) => {
     e.preventDefault();
+    setError('');
     try {
       const res = await fetch('http://localhost:3001/api/posts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          token: user.token,
+        },
         body: JSON.stringify({ title, content }),
       });
       const newPost = await res.json();
+      if (!res.ok) {
+        throw new Error(newPost.error || 'Failed to create post');
+      }
       setPosts([...posts, newPost]);
       setTitle('');
       setContent('');
     } catch (err) {
       console.error('Error creating post:', err);
+      setError('Error creating post: ' + err.message);
+    }
+  };
+
+  // Handle post editing
+  const handleEditPost = (post) => {
+    setEditingPost(post);
+    setTitle(post.title);
+    setContent(post.content);
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      const res = await fetch(`http://localhost:3001/api/posts/${editingPost.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          token: user.token,
+        },
+        body: JSON.stringify({ title, content, published: editingPost.published }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update post');
+      }
+      setPosts(posts.map(p => (p.id === editingPost.id ? { ...p, title, content, published: editingPost.published } : p)));
+      setEditingPost(null);
+      setTitle('');
+      setContent('');
+    } catch (err) {
+      console.error('Error updating post:', err);
+      setError('Error updating post: ' + err.message);
+    }
+  };
+
+  // Handle unpublish post
+  const handleUnpublishPost = async (postId) => {
+    setError('');
+    try {
+      const res = await fetch(`http://localhost:3001/api/posts/${postId}/unpublish`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          token: user.token,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to unpublish post');
+      }
+      fetchPosts(); // Refresh the posts list
+    } catch (err) {
+      console.error('Error unpublishing post:', err);
+      setError('Error unpublishing post: ' + err.message);
+    }
+  };
+
+  // Handle publish post
+  const handlePublishPost = async (postId) => {
+    setError('');
+    try {
+      const res = await fetch(`http://localhost:3001/api/posts/${postId}/publish`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          token: user.token,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to publish post');
+      }
+      fetchPosts(); // Refresh the posts list
+    } catch (err) {
+      console.error('Error publishing post:', err);
+      setError('Error publishing post: ' + err.message);
+    }
+  };
+
+  // Handle delete post
+  const handleDeletePost = async (postId) => {
+    setError('');
+    try {
+      const res = await fetch(`http://localhost:3001/api/posts/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          token: user.token,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete post');
+      }
+      fetchPosts(); // Refresh the posts list
+    } catch (err) {
+      console.error('Error deleting post:', err);
+      setError('Error deleting post: ' + err.message);
+    }
+  };
+
+  // Handle role update
+  const handleRoleUpdate = async (userId, newRole) => {
+    setError('');
+    try {
+      const res = await fetch(`http://localhost:3001/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          token: user.token,
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update role');
+      }
+      setUsers(users.map(u => (u.id === userId ? { ...u, role: newRole } : u)));
+    } catch (err) {
+      console.error('Error updating role:', err);
+      setError('Error updating role: ' + err.message);
     }
   };
 
   if (!user) {
+    return <AuthForm onLogin={handleLogin} error={error} setError={setError} />;
+  }
+
+  // Render front page for viewers, CMS for admins/content managers
+  if (user.role === 'viewer') {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="p-6 bg-white rounded shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Admin Login</h2>
-          <button
-            onClick={login}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Login as Admin
-          </button>
-          <p className="mt-2 text-sm text-gray-600">
-            (Mock login. Implement real auth later.)
-          </p>
-        </div>
-      </div>
+      <FrontPage
+        user={user}
+        posts={posts}
+        designSettings={designSettings}
+        logout={logout}
+      />
     );
   }
 
@@ -61,54 +281,43 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-blue-600 text-white p-4 flex justify-between">
         <h1 className="text-xl font-bold">CMS Admin</h1>
-        <button
-          onClick={logout}
-          className="bg-red-500 px-4 py-2 rounded hover:bg-red-600"
-        >
-          Logout
-        </button>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm">Role: {user.role}</span>
+          <button
+            onClick={logout}
+            className="bg-red-500 px-4 py-2 rounded hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
       </nav>
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Manage Records</h2>
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Create</h3>
-          <form onSubmit={handleCreatePost} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-2 border rounded"
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <div className="flex flex-col lg:flex-row gap-4">
+          {user.role === 'admin' && (
+            <UserManagement
+              users={users}
+              user={user}
+              handleRoleUpdate={handleRoleUpdate}
             />
-            <textarea
-              placeholder="Content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full p-2 border rounded h-32"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Create record
-            </button>
-          </form>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Records</h3>
-          {posts.length === 0 ? (
-            <p>No records yet.</p>
-          ) : (
-            <ul className="space-y-2">
-              {posts.map(post => (
-                <li key={post.id} className="p-4 border rounded">
-                  <h4 className="font-bold">{post.title}</h4>
-                  <p>{post.content}</p>
-                  <p className="text-sm text-gray-500">{new Date(post.created_at).toLocaleString()}</p>
-                </li>
-              ))}
-            </ul>
           )}
+          <RecordManagement
+            user={user}
+            posts={posts}
+            editingPost={editingPost}
+            title={title}
+            setTitle={setTitle}
+            content={content}
+            setContent={setContent}
+            setEditingPost={setEditingPost}
+            handleCreatePost={handleCreatePost}
+            handleSaveEdit={handleSaveEdit}
+            handleEditPost={handleEditPost}
+            handleUnpublishPost={handleUnpublishPost}
+            handlePublishPost={handlePublishPost}
+            handleDeletePost={handleDeletePost}
+            setError={setError}
+          />
         </div>
       </div>
     </div>
