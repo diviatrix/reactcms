@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 
-const DesignBlock = ({ user, token, setError }) => {
+const DesignBlock = ({ token, setError }) => {
   const [designSettings, setDesignSettings] = useState({
     header_text: 'Welcome to Our Website',
     primary_color: '#2563eb',
@@ -9,18 +10,23 @@ const DesignBlock = ({ user, token, setError }) => {
 
   useEffect(() => {
     // Fetch design settings on mount
-    fetch('http://localhost:3001/api/design', {
+    fetch(API_BASE_URL + "design", {
       headers: { token },
     })
-      .then(res => {
+      .then(async res => {
         if (!res.ok) {
           throw new Error('Failed to fetch design settings');
         }
-        return res.json();
+        const contentType = res.headers.get('Content-Type');
+        if (contentType && contentType.startsWith('application/json')) {
+          return await res.json();
+        } else {
+          throw new Error('Invalid JSON response');
+        }
       })
       .then(data => setDesignSettings(data))
       .catch(err => {
-        console.error('Error fetching design settings:', err);
+        console.error('Error fetching design settings:'+ API_BASE_URL + "design", err);
         setError('Error fetching design settings: ' + err.message);
       });
   }, [token, setError]);
@@ -29,7 +35,7 @@ const DesignBlock = ({ user, token, setError }) => {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:3001/api/design', {
+      const res = await fetch(`${API_BASE_URL}design`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +49,7 @@ const DesignBlock = ({ user, token, setError }) => {
       }
       alert('Design settings updated successfully!');
     } catch (err) {
-      console.error('Error updating design settings:', err);
+      console.error('Error updating design settings: ' + API_BASE_URL + 'design', err);
       setError('Error updating design settings: ' + err.message);
     }
   };

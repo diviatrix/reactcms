@@ -39,7 +39,7 @@ function App() {
         }
       })
       .catch(err => {
-        console.error('Error fetching posts:', err);
+        console.error('Error fetching posts: ' + API_BASE_URL + 'posts', err);
         setError('Error fetching posts: ' + err.message);
         setPosts([]);
       });
@@ -58,7 +58,7 @@ function App() {
       })
       .then(data => setDesignSettings(data))
       .catch(err => {
-        console.error('Error fetching design settings:', err);
+        console.error('Error fetching design settings: ' + API_BASE_URL + 'design', err);
         setError('Error fetching design settings: ' + err.message);
       });
   };
@@ -91,7 +91,7 @@ function App() {
           }
         })
         .catch(err => {
-          console.error('Error fetching users:', err);
+          console.error('Error fetching users: ' + API_BASE_URL + 'users', err);
           setError('Error fetching users: ' + err.message);
           setUsers([]);
         });
@@ -136,7 +136,7 @@ function App() {
       setTitle('');
       setContent('');
     } catch (err) {
-      console.error('Error creating post:', err);
+      console.error('Error creating post: ' + API_BASE_URL + 'posts', err);
       setError('Error creating post: ' + err.message);
     }
   };
@@ -169,7 +169,7 @@ function App() {
       setTitle('');
       setContent('');
     } catch (err) {
-      console.error('Error updating post:', err);
+      console.error('Error updating post: ' + API_BASE_URL + 'posts/' + editingPost.id, err);
       setError('Error updating post: ' + err.message);
     }
   };
@@ -191,7 +191,7 @@ function App() {
       }
       fetchPosts(); // Refresh the posts list
     } catch (err) {
-      console.error('Error unpublishing post:', err);
+      console.error('Error unpublishing post: ' + API_BASE_URL + 'posts/' + postId, err);
       setError('Error unpublishing post: ' + err.message);
     }
   };
@@ -213,7 +213,7 @@ function App() {
       }
       fetchPosts(); // Refresh the posts list
     } catch (err) {
-      console.error('Error publishing post:', err);
+      console.error('Error publishing post: ' + API_BASE_URL + 'posts/' + postId, err);
       setError('Error publishing post: ' + err.message);
     }
   };
@@ -235,7 +235,7 @@ function App() {
       }
       fetchPosts(); // Refresh the posts list
     } catch (err) {
-      console.error('Error deleting post:', err);
+      console.error('Error deleting post: ' + API_BASE_URL + 'posts/' + postId, err);
       setError('Error deleting post: ' + err.message);
     }
   };
@@ -258,7 +258,7 @@ function App() {
       }
       setUsers(users.map(u => (u.id === userId ? { ...u, role: newRole } : u)));
     } catch (err) {
-      console.error('Error updating role:', err);
+      console.error('Error updating role: ' + API_BASE_URL + 'users/' + userId, err);
       setError('Error updating role: ' + err.message);
     }
   };

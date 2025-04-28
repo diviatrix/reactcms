@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API_BASE_URL } from '../config';
 
 const AuthForm = ({ onLogin, error, setError }) => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -7,10 +8,9 @@ const AuthForm = ({ onLogin, error, setError }) => {
 
   // Handle user registration
   const handleRegister = async (e) => {
-    e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:3001/api/register', {
+      const res = await fetch(`${API_BASE_URL}register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -33,7 +33,7 @@ const AuthForm = ({ onLogin, error, setError }) => {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:3001/api/login', {
+      const res = await fetch(`${API_BASE_URL}login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
