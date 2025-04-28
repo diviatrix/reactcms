@@ -8,7 +8,11 @@ const port = API_PORT || 3001;
 
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://1337.plus',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 app.use(express.json());
 
 // Initialize SQLite database
