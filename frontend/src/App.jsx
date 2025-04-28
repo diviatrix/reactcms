@@ -3,7 +3,14 @@ import AuthForm from './components/AuthForm';
 import UserManagement from './components/UserManagement';
 import RecordManagement from './components/RecordManagement';
 import FrontPage from './components/FrontPage';
-import config from '../../config';
+import userconfig from '../../config/user/config';
+import config from '../../config/config';
+
+// Merge API_BASE_URL from userconfig if available
+if (userconfig && userconfig.API_BASE_URL) {
+  config.API_BASE_URL = userconfig.API_BASE_URL;
+}
+const API_BASE_URL = config.API_BASE_URL;
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -17,8 +24,6 @@ function App() {
   const [users, setUsers] = useState([]);
   const [editingPost, setEditingPost] = useState(null);
   const [designSettings, setDesignSettings] = useState(null);
-  const API_BASE_URL = config.API_BASE_URL;
-
 
   // Fetch posts from API
   const fetchPosts = () => {

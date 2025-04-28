@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import config from '../../../config';
+import userconfig from '../../../config/user/config';
+import config from '../../../config/config';
+
+// Merge API_BASE_URL from userconfig if available
+if (userconfig && userconfig.API_BASE_URL) {
+  config.API_BASE_URL = userconfig.API_BASE_URL;
+}
 const API_BASE_URL = config.API_BASE_URL;
 
 const DesignBlock = ({ token, setError }) => {

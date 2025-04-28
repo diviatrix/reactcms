@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import userconfig from '../../../user/config'; // Ensure this import is correct)
-import config from '../../../config';
+import userconfig from '../../../config/user/config'; // Ensure this import is correct)
+import config from '../../../config/config';
 
 if (userconfig && userconfig.API_BASE_URL) {
   config.API_BASE_URL = userconfig.API_BASE_URL;
