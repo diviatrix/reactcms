@@ -1,16 +1,18 @@
+const { API_PORT } = require('./config.json');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const app = express();
-const port = 3001;
+const port = API_PORT || 3001;
+
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Initialize SQLite database
-const db = new sqlite3.Database('./cms.db', (err) => {
+const db = new sqlite3.Database('./db/cms.db', (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
   } else {

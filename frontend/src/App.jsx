@@ -281,18 +281,22 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-blue-600 text-white p-4 flex justify-between">
-        <h1 className="text-xl font-bold">CMS Admin</h1>
-        <div className="flex items-center space-x-4">
-          <span className="text-sm">Role: {user.role}</span>
-          <button
-            onClick={logout}
-            className="bg-red-500 px-4 py-2 rounded hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+      <div className="bg-green-600 text-white p-4 flex items-center justify-between">
+        <nav className="flex space-x-4">
+          <div><img src="/1337.png" alt="Logo" width={64}/></div>
+          <h1 className="text-xl font-bold text-gray-600">React CMS</h1>
+        </nav>
+        <div className="flex justify-between space-x-4"> {/* Updated from align-right to justify-between */}
+            <span className="text-sm">Role: {user.role}</span>
+            <button
+              onClick={logout}
+              className="bg-red-500 px-4 py-2 rounded hover:bg-red-600"
+            >
+              Logout
+            </button>
+          </div>
+      </div>
+      
       <div className="p-6">
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="flex flex-col lg:flex-row gap-4">
