@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'http://1337.plus:3001/api/';
+export const API_BASE_URL = 'https://api.1337.plus/';
