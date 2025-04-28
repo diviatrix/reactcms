@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import userconfig from '../../../config/user/config'; // Ensure this import is correct)
+import { useState, useEffect } from 'react'; // Add useEffect
+import { useNavigate } from 'react-router-dom';
+import userconfig from '../../../config/user/config';
 import config from '../../../config/config';
 
 if (userconfig && userconfig.API_BASE_URL) {
@@ -11,6 +12,12 @@ const AuthForm = ({ onLogin, error, setError }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  // Clear errors when the component mounts
+  useEffect(() => {
+    setError('');
+  }, [setError]);
 
   // Handle user registration
   const handleRegister = async (e) => {
@@ -29,7 +36,7 @@ const AuthForm = ({ onLogin, error, setError }) => {
       setIsRegistering(false);
       setUsername('');
       setPassword('');
-      alert('Registration successful! Please log in.');
+      navigate('/login');
     } catch (err) {
       setError(err.message);
     }
