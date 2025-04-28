@@ -3,6 +3,7 @@ import AuthForm from './components/AuthForm';
 import UserManagement from './components/UserManagement';
 import RecordManagement from './components/RecordManagement';
 import FrontPage from './components/FrontPage';
+import { API_BASE_URL } from '../../vite.config.js';
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -17,9 +18,10 @@ function App() {
   const [editingPost, setEditingPost] = useState(null);
   const [designSettings, setDesignSettings] = useState(null);
 
+
   // Fetch posts from API
   const fetchPosts = () => {
-    fetch('http://localhost:3001/api/posts', {
+    fetch(API_BASE_URL + '/api/posts', {
       headers: { token: user.token },
     })
       .then(res => {
@@ -45,7 +47,7 @@ function App() {
 
   // Fetch design settings
   const fetchDesignSettings = () => {
-    fetch('http://localhost:3001/api/design', {
+    fetch(API_BASE_URL + '/api/design', {
       headers: { token: user.token },
     })
       .then(res => {
@@ -71,7 +73,7 @@ function App() {
   // Fetch users for admin (if user is admin)
   useEffect(() => {
     if (user && user.role === 'admin') {
-      fetch('http://localhost:3001/api/users', {
+      fetch(API_BASE_URL + '/api/users', {
         headers: { token: user.token },
       })
         .then(res => {
@@ -118,7 +120,7 @@ function App() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:3001/api/posts', {
+      const res = await fetch(API_BASE_URL + '/api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +152,7 @@ function App() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch(`http://localhost:3001/api/posts/${editingPost.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/posts/${editingPost.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +178,7 @@ function App() {
   const handleUnpublishPost = async (postId) => {
     setError('');
     try {
-      const res = await fetch(`http://localhost:3001/api/posts/${postId}/unpublish`, {
+      const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/unpublish`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -198,7 +200,7 @@ function App() {
   const handlePublishPost = async (postId) => {
     setError('');
     try {
-      const res = await fetch(`http://localhost:3001/api/posts/${postId}/publish`, {
+      const res = await fetch(`${API_BASE_URL}/api/posts/${postId}/publish`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +222,7 @@ function App() {
   const handleDeletePost = async (postId) => {
     setError('');
     try {
-      const res = await fetch(`http://localhost:3001/api/posts/${postId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -242,7 +244,7 @@ function App() {
   const handleRoleUpdate = async (userId, newRole) => {
     setError('');
     try {
-      const res = await fetch(`http://localhost:3001/api/users/${userId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
