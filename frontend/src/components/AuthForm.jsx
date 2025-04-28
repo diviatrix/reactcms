@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { API_BASE_URL } from '../config';
+import { API_BASE_URL } from '../config.json';
 
 const AuthForm = ({ onLogin, error, setError }) => {
   const [isRegistering, setIsRegistering] = useState(false);
