@@ -136,4 +136,5 @@ dist
 .pnp.*
 
 # React CMS
-/db/*
+db/*
+user/config.json

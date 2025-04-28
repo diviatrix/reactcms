@@ -1,15 +1,17 @@
-const { API_PORT, origin: ORIGIN } = require('./config.json');
+const config = require('./config.json');
+const user_config = require('./user/config.json');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const app = express();
-const port = API_PORT || 3001;
 
+const mergedConfig = { ...config, ...user_config };
+Object.assign(config, mergedConfig);
 
 // Middleware
 app.use(cors({
-  origin: ORIGIN, // Allow both production and local origins
+  origin: config.ORIGIN, // Allow both production and local origins
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow necessary methods
   allowedHeaders: ['Content-Type', 'token'], // Explicitly allow token header
   credentials: true // Allow credentials for CORS
@@ -368,6 +370,6 @@ app.put('/api/users/:id', requireRole(['admin']), (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+app.listen(config.API_PORT, () => {
+  console.log(`Server running on ${config.API_BASE_URL}`);
 });

@@ -3,7 +3,7 @@ import AuthForm from './components/AuthForm';
 import UserManagement from './components/UserManagement';
 import RecordManagement from './components/RecordManagement';
 import FrontPage from './components/FrontPage';
-import { API_BASE_URL } from './config';
+import config from '../../config';
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -17,6 +17,7 @@ function App() {
   const [users, setUsers] = useState([]);
   const [editingPost, setEditingPost] = useState(null);
   const [designSettings, setDesignSettings] = useState(null);
+  const API_BASE_URL = config.API_BASE_URL;
 
 
   // Fetch posts from API

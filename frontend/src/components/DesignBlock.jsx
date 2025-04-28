@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../config.json';
+import config from '../../../config';
+const API_BASE_URL = config.API_BASE_URL;
 
 const DesignBlock = ({ token, setError }) => {
   const [designSettings, setDesignSettings] = useState({
