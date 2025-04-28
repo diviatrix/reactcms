@@ -1,4 +1,4 @@
-const { API_PORT } = require('./config.json');
+const { API_PORT, origin: ORIGIN } = require('./config.json');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -9,9 +9,10 @@ const port = API_PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: 'https://1337.plus',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
+  origin: ORIGIN, // Allow both production and local origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow necessary methods
+  allowedHeaders: ['Content-Type', 'token'], // Explicitly allow token header
+  credentials: true // Allow credentials for CORS
 }));
 app.use(express.json());
 
