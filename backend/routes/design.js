@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
 const { requireRole } = require('../middleware/auth');
+const multer = require('multer');
+
+// Configure multer to store files (adjust as needed)
+const upload = multer({ dest: 'uploads/' });
 
 // Get design settings
 router.get('/', (req, res) => {
@@ -19,8 +23,8 @@ router.get('/', (req, res) => {
 });
 
 // Update design settings
-router.put('/', requireRole(['admin']), (req, res) => {
-  console.log('PUT /api/design received:', req.body);
+router.put('/', requireRole(['admin']), upload.single('file'), (req, res) => {
+  console.log('PUT /api/design received:', req.body, req.file); // Debug
   const { header_text, primary_color, secondary_color } = req.body;
   if (!header_text || !primary_color || !secondary_color) {
     return res.status(400).json({ error: 'Header text, primary color, and secondary color are required' });
@@ -33,6 +37,7 @@ router.put('/', requireRole(['admin']), (req, res) => {
         console.error('Database error:', err);
         return res.status(500).json({ error: 'Database error' });
       }
+      // Optionally handle file (e.g., save file path to DB)
       res.json({ message: 'Design settings updated successfully' });
     }
   );

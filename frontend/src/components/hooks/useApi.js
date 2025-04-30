@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import config from '../config/config.json'; // Use * as to import the module
+import config from '../config/config.json'; // Import API_BASE_URL
 
 // Use config directly since there’s no userconfig merging needed here
 const API_BASE_URL = config.API_BASE_URL;

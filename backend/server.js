@@ -1,16 +1,21 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer'); // Add multer
 
 const postsRouter = require('./routes/posts');
 const designRouter = require('./routes/design');
 const usersRouter = require('./routes/users');
-const CONFIG = require('./config/config.js');  
+const CONFIG = require('./config/config.json');
 const app = express();
 
-const config = CONFIG.config || CONFIG; // Support both direct and named export
+const config = CONFIG.config || CONFIG;
 const { API_PORT, ORIGIN } = config;
 
-// CORS middleware with dynamic origin validation
+// Configure multer (store files in 'uploads/' directory or customize as needed)
+const upload = multer({ dest: 'uploads/' }); // Create 'uploads/' directory in your project root
+
+// CORS middleware
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || origin === ORIGIN) {
@@ -24,6 +29,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Optional: for URL-encoded form data
 
 // Routes
 app.use('/api/posts', postsRouter);
