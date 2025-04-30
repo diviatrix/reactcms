@@ -1,17 +1,14 @@
 const express = require('express');
 const cors = require('cors');
-const config = require('./config/config.json');
-const userConfig = require('./config/user/config.json');
+
 const postsRouter = require('./routes/posts');
 const designRouter = require('./routes/design');
 const usersRouter = require('./routes/users');
-
+const CONFIG = require('./config/config.js');  
 const app = express();
 
-// Merge configurations
-API_PORT = userConfig.API_PORT || config.API_PORT;
-API_BASE_URL = userConfig.API_BASE_URL || config.API_BASE_URL;
-ORIGIN = userConfig.ORIGIN || config.ORIGIN;
+const config = CONFIG.config || CONFIG; // Support both direct and named export
+const { API_PORT, ORIGIN } = config;
 
 // CORS middleware with dynamic origin validation
 app.use(cors({
@@ -37,7 +34,6 @@ app.post('/api/login', usersRouter.stack.find(layer => layer.route?.path === '/l
 
 // Start server
 app.listen(API_PORT, () => {
-  console.log(`API Server running on ${API_BASE_URL}`);
   console.log(`API Server port ${API_PORT}`);
   console.log('Server has started successfully!');
 });

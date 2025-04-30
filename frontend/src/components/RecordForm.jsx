@@ -1,56 +1,59 @@
 const RecordForm = ({ editingPost, title, setTitle, content, setContent, handleSubmit, setEditingPost }) => {
-    return (
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-2">{editingPost ? 'Edit Record' : 'Create'}</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 border rounded"
-          />
-          <textarea
-            placeholder="Content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full p-2 border rounded h-32"
-          />
-          {editingPost && (
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={editingPost.published}
-                onChange={(e) => setEditingPost({ ...editingPost, published: e.target.checked })}
-                className="mr-2"
-              />
-              <label className="text-sm text-gray-700">Published</label>
-            </div>
-          )}
-          <div className="flex space-x-2">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              {editingPost ? 'Save' : 'Create record'}
-            </button>
-            {editingPost && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingPost(null);
-                  setTitle('');
-                  setContent('');
-                }}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-    );
+  const onSubmit = (e) => {
+    if (editingPost) {
+      // If editing, pass all arguments for handleSaveEdit
+      handleSubmit(e, editingPost, title, content, setEditingPost, setTitle, setContent);
+    } else {
+      // If creating, pass arguments for handleCreatePost
+      handleSubmit(e, title, content, setTitle, setContent);
+    }
   };
-  
-  export default RecordForm;
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4 mb-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Title</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full p-2 border rounded mt-1"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Content</label>
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="w-full p-2 border rounded mt-1"
+          rows="4"
+          required
+        />
+      </div>
+      <div className="flex space-x-2">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          {editingPost ? 'Update' : 'Create'} Post
+        </button>
+        {editingPost && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingPost(null);
+              setTitle('');
+              setContent('');
+            }}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+    </form>
+  );
+};
+
+export default RecordForm;

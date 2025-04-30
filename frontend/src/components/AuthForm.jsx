@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react'; // Add useEffect
 import { useNavigate } from 'react-router-dom';
-import userconfig from '../../../config/user/config';
-import config from '../../../config/config';
+import config from './config/config.json'; // Import the config file
 
-if (userconfig && userconfig.API_BASE_URL) {
-  config.API_BASE_URL = userconfig.API_BASE_URL;
-}
 const API_BASE_URL = config.API_BASE_URL;
 
 const AuthForm = ({ onLogin, error, setError }) => {

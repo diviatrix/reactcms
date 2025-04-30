@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import AuthForm from './components/AuthForm';
 import FrontPage from './components/FrontPage';
 import AdminPanel from './components/AdminPanel'; // Import the new AdminPanel component
-import useApi from './hooks/useApi'; // Import the custom hook
+import useApi from './components/hooks/useApi'; // Import the custom hook
 
 function App() {
   const [user, setUser] = useState(() => {

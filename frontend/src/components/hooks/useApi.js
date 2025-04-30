@@ -1,11 +1,7 @@
 import { useCallback } from 'react';
-import userconfig from '../../../config/user/config';
-import config from '../../../config/config';
+import config from '../config/config.json'; // Use * as to import the module
 
-// Merge API_BASE_URL from userconfig if available
-if (userconfig && userconfig.API_BASE_URL) {
-  config.API_BASE_URL = userconfig.API_BASE_URL;
-}
+// Use config directly since there’s no userconfig merging needed here
 const API_BASE_URL = config.API_BASE_URL;
 
 const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
@@ -83,6 +79,13 @@ const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
   const handleCreatePost = async (e, title, content, setTitle, setContent) => {
     e.preventDefault();
     setError('');
+
+    // Validate title and content
+    if (!title || !title.trim() || !content || !content.trim()) {
+      setError('Title and content are required');
+      return;
+    }
+
     try {
       const res = await fetch(API_BASE_URL + 'posts', {
         method: 'POST',
@@ -109,6 +112,13 @@ const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
   const handleSaveEdit = async (e, editingPost, title, content, setEditingPost, setTitle, setContent) => {
     e.preventDefault();
     setError('');
+
+    // Validate title and content
+    if (!title || !title.trim() || !content || !content.trim()) {
+      setError('Title and content are required');
+      return;
+    }
+
     try {
       const res = await fetch(`${API_BASE_URL}posts/${editingPost.id}`, {
         method: 'PUT',
