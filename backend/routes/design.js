@@ -8,7 +8,7 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
 // Get design settings
-router.get('/', (req, res) => {
+router.get('/', (_req, res) => { // Prefix unused 'req' with underscore
   console.log('GET /api/design received');
   db.get('SELECT * FROM design_settings WHERE id = 1', (err, row) => {
     if (err) {
@@ -55,12 +55,27 @@ router.put('/', requireRole(['admin']), upload.single('file'), (req, res) => {
     const sql = 'INSERT OR REPLACE INTO design_settings (id, header_text, primary_color, secondary_color, logo_img) VALUES (1, ?, ?, ?, ?)';
     const params = [newHeaderText, newPrimaryColor, newSecondaryColor, newLogoImg];
     
+    // Ensure the 'uploads/' directory exists and the server process has write permissions to it on the remote host.
+    // This is a common cause for 500 errors during file uploads.
     db.run(sql, params, function (err) {
       if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ error: 'Database error' });
+        // Log the specific error for better debugging on the server
+        console.error('Database error updating design settings:', err.message); 
+        return res.status(500).json({ error: 'Database error updating design settings', details: err.message });
       }
-      res.json({ message: 'Design settings updated successfully' });
+      // Fetch the updated row to return it
+      db.get('SELECT * FROM design_settings WHERE id = 1', (err, updatedRow) => {
+        if (err) {
+           console.error('Database error fetching updated design settings:', err.message);
+           // Still return success message, but log the fetch error
+           return res.json({ message: 'Design settings updated successfully, but failed to fetch updated data.' });
+        }
+        if (!updatedRow) {
+           // Should not happen after successful update, but handle defensively
+           return res.status(404).json({ error: 'Updated design settings not found' });
+        }
+        res.json({ message: 'Design settings updated successfully', settings: updatedRow });
+      });
     });
   });
 });
