@@ -208,8 +208,8 @@ const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
     }
   };
 
-  // Handle role update
-  const handleRoleUpdate = async (userId, newRole) => {
+  // Handle user update (for admin)
+  const handleUserUpdate = async (userId, field, value) => {
     setError('');
     try {
       const res = await fetch(`${API_BASE_URL}users/${userId}`, {
@@ -218,16 +218,16 @@ const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
           'Content-Type': 'application/json',
           token: user.token,
         },
-        body: JSON.stringify({ role: newRole }),
+        body: JSON.stringify({ [field]: value }),
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to update role');
+        throw new Error(data.error || `Failed to update user ${field}`);
       }
-      setUsers(prev => prev.map(u => (u.id === userId ? { ...u, role: newRole } : u)));
+      setUsers(prev => prev.map(u => (u.id === userId ? { ...u, [field]: value } : u)));
     } catch (err) {
-      console.error('Error updating role: ' + API_BASE_URL + 'users/' + userId, err);
-      setError('Error updating role: ' + err.message);
+      console.error(`Error updating user ${field}: ${API_BASE_URL}users/${userId}`, err);
+      setError(`Error updating user ${field}: ${err.message}`);
     }
   };
 
@@ -240,7 +240,7 @@ const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
     handleUnpublishPost,
     handlePublishPost,
     handleDeletePost,
-    handleRoleUpdate,
+    handleUserUpdate,
   };
 };
 

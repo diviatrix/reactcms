@@ -4,8 +4,8 @@ const db = require('../db/db');
 const { requireRole } = require('../middleware/auth');
 
 // Get all posts
-router.get('/', requireRole(['admin', 'content_manager', 'viewer']), (req, res) => {
-  const query = req.user.role === 'viewer' 
+router.get('/', (req, res) => {
+  const query = req.query.publishedOnly
     ? 'SELECT * FROM posts WHERE published = 1' 
     : 'SELECT * FROM posts';
   db.all(query, [], (err, rows) => {

@@ -8,6 +8,7 @@ const AuthForm = ({ onLogin, error, setError }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [nickname, setNickname] = useState(''); // Added nickname state
   const navigate = useNavigate();
 
   // Clear errors when the component mounts
@@ -23,7 +24,7 @@ const AuthForm = ({ onLogin, error, setError }) => {
       const res = await fetch(`${API_BASE_URL}register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, nickname }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -32,6 +33,7 @@ const AuthForm = ({ onLogin, error, setError }) => {
       setIsRegistering(false);
       setUsername('');
       setPassword('');
+      setNickname(''); 
       navigate('/login');
     } catch (err) {
       setError(err.message);
@@ -76,6 +78,18 @@ const AuthForm = ({ onLogin, error, setError }) => {
               required
             />
           </div>
+          {isRegistering && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Nickname</label>
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                className="w-full p-2 border rounded mt-1"
+                required
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700">Password</label>
             <input

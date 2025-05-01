@@ -28,17 +28,15 @@ function App() {
     handleUnpublishPost,
     handlePublishPost,
     handleDeletePost,
-    handleRoleUpdate,
+    handleUserUpdate
   } = useApi(user, setPosts, setUsers, setDesignSettings, setError);
 
   // Fetch data when user is authenticated
   useEffect(() => {
-    if (user) {
-      fetchPosts();
-      fetchDesignSettings();
-      if (user.role === 'admin') {
-        fetchUsers();
-      }
+    fetchPosts();
+    fetchDesignSettings();
+    if (user && user.role === 'admin') {
+      fetchUsers();
     }
   }, [user, fetchPosts, fetchDesignSettings, fetchUsers]);
 
@@ -113,7 +111,8 @@ function App() {
                 handleUnpublishPost={handleUnpublishPost}
                 handlePublishPost={handlePublishPost}
                 handleDeletePost={handleDeletePost}
-                handleRoleUpdate={handleRoleUpdate}
+                handleUserUpdate={handleUserUpdate}
+                designSettings={designSettings}
                 logout={logout}
               />
             ) : (

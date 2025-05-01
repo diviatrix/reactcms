@@ -9,10 +9,13 @@ const DesignBlock = ({ user }) => {
     header_text: '1337+',
     primary_color: '#439d2a',
     secondary_color: '#525252',
+    logo_img: '69da57ca1fc90133789ea748db46a383',
+  // Default logo image hash
+  // This should be replaced with the actual default logo image hash from your database
   });
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState('69da57ca1fc90133789ea748db46a383');
   const [error, setError] = useState('');
-  const [logoPreview, setLogoPreview] = useState(null);
+  const [logoPreview, setLogoPreview] = useState('../assets/1337.png'); // Default logo preview
 
   // Handle upload file changes
   const handleUploadChange = (e) => {
@@ -47,6 +50,7 @@ const DesignBlock = ({ user }) => {
       formData.append('header_text', designSettings.header_text || '');
       formData.append('primary_color', designSettings.primary_color || '#000000');
       formData.append('secondary_color', designSettings.secondary_color || '#000000');
+      formData.append('logo_img', uploadedFile ? uploadedFile : designSettings.logo_img || '');
   
       // Debug FormData
       for (let [key, value] of formData.entries()) {

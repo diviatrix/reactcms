@@ -30,6 +30,7 @@ const initializeDatabase = () => {
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT NOT NULL UNIQUE,
+      nickname TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'viewer'
     )`, (err) => {
@@ -44,9 +45,10 @@ const initializeDatabase = () => {
   db.run(`
     CREATE TABLE IF NOT EXISTS design_settings (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      header_text TEXT NOT NULL DEFAULT 'Welcome to Our Website',
-      primary_color TEXT NOT NULL DEFAULT '#2563eb',
-      secondary_color TEXT NOT NULL DEFAULT '#f97316'
+      header_text TEXT NOT NULL DEFAULT '1337+',
+      primary_color TEXT NOT NULL DEFAULT '#439d2a',
+      secondary_color TEXT NOT NULL DEFAULT '#525252',
+      logo_img '69da57ca1fc90133789ea748db46a383'
     )`, (err) => {
     if (err) {
       console.error('Error creating design_settings table:', err.message);
@@ -61,8 +63,8 @@ const initializeDatabase = () => {
       }
       if (row.count === 0) {
         db.run(
-          'INSERT INTO design_settings (header_text, primary_color, secondary_color) VALUES (?, ?, ?)',
-          ['Welcome to Our Website', '#2563eb', '#f97316'],
+          'INSERT INTO design_settings (header_text, primary_color, secondary_color, logo_img) VALUES (?, ?, ?, ?)',
+          ['1337+', '#439d2a', '#525252', '69da57ca1fc90133789ea748db46a383'],
           (err) => {
             if (err) {
               console.error('Error inserting default design settings:', err.message);

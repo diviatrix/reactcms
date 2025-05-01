@@ -24,23 +24,45 @@ router.get('/', (req, res) => {
 
 // Update design settings
 router.put('/', requireRole(['admin']), upload.single('file'), (req, res) => {
-  console.log('PUT /api/design received:', req.body, req.file); // Debug
-  const { header_text, primary_color, secondary_color } = req.body;
-  if (!header_text || !primary_color || !secondary_color) {
-    return res.status(400).json({ error: 'Header text, primary color, and secondary color are required' });
+  console.log('PUT /api/design received:', req.body, req.file);
+  const { header_text, primary_color, secondary_color, logo_img } = req.body;
+  
+  // Check if at least one parameter is provided
+  if (!header_text && !primary_color && !secondary_color && !logo_img && !req.file) {
+    return res.status(400).json({ error: 'At least one parameter must be provided' });
   }
-  db.run(
-    'INSERT OR REPLACE INTO design_settings (id, header_text, primary_color, secondary_color) VALUES (1, ?, ?, ?)',
-    [header_text, primary_color, secondary_color],
-    function (err) {
+  
+  // First, get the current values to use as defaults
+  db.get('SELECT * FROM design_settings WHERE id = 1', (err, row) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    
+    // Use current values as defaults, or empty strings if no row exists
+    const currentValues = row || { header_text: '', primary_color: '', secondary_color: '', logo_img: '' };
+    
+    const newHeaderText = header_text !== undefined ? header_text : currentValues.header_text;
+    const newPrimaryColor = primary_color !== undefined ? primary_color : currentValues.primary_color;
+    const newSecondaryColor = secondary_color !== undefined ? secondary_color : currentValues.secondary_color;
+    let newLogoImg = logo_img !== undefined ? logo_img : currentValues.logo_img;
+    
+    // Handle file upload (overrides logo_img from body)
+    if (req.file) {
+      newLogoImg = req.file.path;
+    }
+    
+    const sql = 'INSERT OR REPLACE INTO design_settings (id, header_text, primary_color, secondary_color, logo_img) VALUES (1, ?, ?, ?, ?)';
+    const params = [newHeaderText, newPrimaryColor, newSecondaryColor, newLogoImg];
+    
+    db.run(sql, params, function (err) {
       if (err) {
         console.error('Database error:', err);
         return res.status(500).json({ error: 'Database error' });
       }
-      // Optionally handle file (e.g., save file path to DB)
       res.json({ message: 'Design settings updated successfully' });
-    }
-  );
+    });
+  });
 });
 
 module.exports = router;
