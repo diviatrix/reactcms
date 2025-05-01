@@ -24,4 +24,5 @@ dist-ssr
 *.sw?
 
 # React CMS
-src/assets/config/config.json
+frontend/src/assets/config/config.json
+config.json*
