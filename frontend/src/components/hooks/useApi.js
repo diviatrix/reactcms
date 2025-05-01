@@ -231,6 +231,27 @@ const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
     }
   };
 
+  const handleUserDelete = async (userId) => {
+    setError('');
+    try {
+      const res = await fetch(`${API_BASE_URL}users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          token: user.token,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete user');
+      }
+      setUsers(prev => prev.filter(u => u.id !== userId));
+    } catch (err) {
+      console.error('Error deleting user: ' + API_BASE_URL + 'users/' + userId, err);
+      setError('Error deleting user: ' + err.message);
+    }
+  }
+
   return {
     fetchPosts,
     fetchDesignSettings,
@@ -241,6 +262,7 @@ const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
     handlePublishPost,
     handleDeletePost,
     handleUserUpdate,
+    handleUserDelete,
   };
 };
 

@@ -73,6 +73,23 @@ router.get('/', requireRole(['admin']), (req, res) => {
   });
 });
 
+// Delete a user (handles /api/users/:id)
+router.delete('/:id', requireRole(['admin']), (req, res) => {
+  const { id } = req.params;
+  if (parseInt(id) === parseInt(req.user.id)) {
+    return res.status(403).json({ error: 'Cannot delete your own account' });
+  }
+  db.run('DELETE FROM users WHERE id = ?', [id], function (err) {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: 'User deleted successfully' });
+  });
+});
+
 // Update user (handles /api/users/:id)
 router.put('/:id', requireRole(['admin']), (req, res) => {
   const { id } = req.params;
@@ -101,7 +118,33 @@ router.put('/:id', requireRole(['admin']), (req, res) => {
         return res.status(400).json({ error: 'Nickname cannot be empty' });
       }
       break;
-      
+    
+    case 'username':
+      if (!valueToUpdate || valueToUpdate.trim() === '') {
+        return res.status(400).json({ error: 'Username cannot be empty' });
+      }
+      break;
+    
+    case 'password':
+      if (!valueToUpdate || valueToUpdate.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+      }
+      // Hash the new password
+      bcrypt.hash(valueToUpdate, 10, (err, hashedPassword) => {
+        if (err) {
+          return res.status(500).json({ error: 'Error hashing password' });
+        }
+        db.run('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id], function (err) {
+          if (err) {
+            return res.status(500).json({ error: 'Database error' });
+          }
+          if (this.changes === 0) {
+            return res.status(404).json({ error: 'User not found' });
+          }
+          res.json({ message: 'User password updated successfully' });
+        });
+      });
+      return; // Prevent further execution
     default:
       return res.status(400).json({ error: `Cannot update field: ${fieldToUpdate}` });
   }

@@ -1,4 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
+const config = require('../config/config.js');
 
 const initializeDatabase = () => {
   const db = new sqlite3.Database('./db/cms.db', (err) => {
@@ -8,6 +9,8 @@ const initializeDatabase = () => {
     }
     console.log('Connected to SQLite database.');
   });
+
+  const origin = config.ORIGIN || 'http://localhost:5173';
 
   // Create posts table
   db.run(`
@@ -32,7 +35,8 @@ const initializeDatabase = () => {
       username TEXT NOT NULL UNIQUE,
       nickname TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'viewer'
+      role TEXT NOT NULL DEFAULT 'viewer',
+      avatar TEXT DEFAULT '${origin}/public/1337+.png'
     )`, (err) => {
     if (err) {
       console.error('Error creating users table:', err.message);

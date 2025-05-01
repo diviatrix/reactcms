@@ -28,7 +28,8 @@ function App() {
     handleUnpublishPost,
     handlePublishPost,
     handleDeletePost,
-    handleUserUpdate
+    handleUserUpdate,
+    handleUserDelete
   } = useApi(user, setPosts, setUsers, setDesignSettings, setError);
 
   // Fetch data when user is authenticated
@@ -112,6 +113,7 @@ function App() {
                 handlePublishPost={handlePublishPost}
                 handleDeletePost={handleDeletePost}
                 handleUserUpdate={handleUserUpdate}
+                handleUserDelete={handleUserDelete}
                 designSettings={designSettings}
                 logout={logout}
               />

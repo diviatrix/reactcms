@@ -23,6 +23,7 @@ const AdminPanel = ({
   handlePublishPost,
   handleDeletePost,
   handleUserUpdate,
+  handleUserDelete,
   logout,
 }) => {
   const [activeTab, setActiveTab] = useState('records');
@@ -117,6 +118,7 @@ const AdminPanel = ({
               users={users}
               user={user}
               handleUserUpdate={handleUserUpdate}
+              handleUserDelete={handleUserDelete}
             />
           )}
           {activeTab === 'design' && (user.role === 'admin' || user.role === 'content_manager') && (
