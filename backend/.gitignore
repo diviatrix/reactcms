@@ -138,4 +138,5 @@ dist
 # React CMS
 cms.db*
 backend/db/cms.db
+user_config.json*
 backend/config/user_config.json
