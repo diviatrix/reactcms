@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import UserManagement from './UserManagement';
-import RecordManagement from './RecordManagement';
+// filepath: f:\GitRepos\reactcms\frontend\src\components\AdminPanel.jsx
+import FileManagement from './FileManagement';
 import DesignBlock from './DesignBlock';
+import RecordManagement from './RecordManagement';
+import UserManagement from './UserManagement';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const AdminPanel = ({
   user,
@@ -32,7 +34,7 @@ const AdminPanel = ({
     <div className="min-h-screen bg-gray-100">
       <div className="bg-green-600 text-white p-4 flex items-center justify-between">
         <nav className="flex space-x-4">
-          <div><img src="/1337.png" alt="Logo" width={64}/></div>
+          <div><img src="/logo.png" alt="Logo" width={64}/></div>
           <h1 className="text-xl font-bold text-gray-600">React CMS</h1>
         </nav>
         <div className="flex justify-between space-x-4">
@@ -91,6 +93,18 @@ const AdminPanel = ({
                 Design Front Page
               </button>
             )}
+            {(user.role === 'admin' || user.role === 'content_manager') && (
+              <button
+                onClick={() => setActiveTab('files')}
+                className={`px-4 py-2 font-medium text-sm focus:outline-none ${
+                  activeTab === 'files'
+                    ? 'border-b-2 border-blue-500 text-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                File Management
+              </button>
+            )}
           </div>
         </div>
         <div>
@@ -123,6 +137,9 @@ const AdminPanel = ({
           )}
           {activeTab === 'design' && (user.role === 'admin' || user.role === 'content_manager') && (
             <DesignBlock user={user} />
+          )}
+          {activeTab === 'files' && (user.role === 'admin' || user.role === 'content_manager') && (
+            <FileManagement user={user} setError={setError} />
           )}
         </div>
       </div>

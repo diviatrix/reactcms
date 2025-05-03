@@ -28,3 +28,4 @@ frontend/src/assets/config/user_config.json
 user_config.json*
 backend/db/cms.db
 *.db
+backend/db/cms.db

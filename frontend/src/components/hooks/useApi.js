@@ -3,8 +3,11 @@ import config from '../config/config.json'; // Import API_BASE_URL
 
 // Use config directly since there’s no userconfig merging needed here
 const API_BASE_URL = config.API_BASE_URL;
+const ORIGIN = config.ORIGIN; // Default to localhost if not set
+const UPLOAD_DIR = config.UPLOAD_DIR || 'public/'; // Default to public/ if not set
 
 const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
+  
   // Fetch posts from API
   const fetchPosts = useCallback(async () => { // Added async
     setError(''); // Clear previous errors
@@ -63,6 +66,31 @@ const useApi = (user, setPosts, setUsers, setDesignSettings, setError) => {
     }
   }, [user, setDesignSettings, setError]);
 
+
+  // Fetch public uploads 
+  const fetchPublicUploads = useCallback(async () => { // Added async
+    setError(''); // Clear previous errors
+    try {
+      const res = await fetch(ORIGIN + `/public`, {
+        headers: { token: user?.token },
+      });
+      if (!res.ok) {
+        let errorMsg = 'Failed to fetch public uploads';
+        try {
+          const errorData = await res.json();
+          errorMsg = errorData.error || errorMsg;
+        } catch (parseError) {
+
+        }
+        throw new Error(errorMsg);
+      }
+      const data = await res.json();
+      setPosts(data);
+    } catch (err) {
+      console.error('Error fetching public uploads: ' + API_BASE_URL + 'uploads', err);
+      setError('Error fetching public uploads: ' + err.message);
+    }
+  }, [user, setPosts, setError]);
 
   // Fetch users (for admin)
   const fetchUsers = useCallback(async () => { // Added async and corrected structure

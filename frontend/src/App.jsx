@@ -4,6 +4,7 @@ import AuthForm from './components/AuthForm';
 import FrontPage from './components/FrontPage';
 import AdminPanel from './components/AdminPanel'; // Import the new AdminPanel component
 import useApi from './components/hooks/useApi'; // Import the custom hook
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -91,9 +92,10 @@ function App() {
           }
         />
         <Route
-          path="/admin"
-          element={
-            user && (user.role === 'admin' || user.role === 'content_manager') ? (
+        path="/admin"
+        element={
+          <ErrorBoundary>
+            {user && (user.role === 'admin' || user.role === 'content_manager') ? (
               <AdminPanel
                 user={user}
                 posts={posts}
@@ -116,10 +118,11 @@ function App() {
                 handleUserDelete={handleUserDelete}
                 designSettings={designSettings}
                 logout={logout}
-              />
-            ) : (
-              <Navigate to="/login" />
-            )
+                />
+              ) : (
+                <Navigate to="/login" />
+              )}
+            </ErrorBoundary>
           }
         />
       </Routes>

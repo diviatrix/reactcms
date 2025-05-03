@@ -52,7 +52,7 @@ const initializeDatabase = () => {
       header_text TEXT NOT NULL DEFAULT '1337+',
       primary_color TEXT NOT NULL DEFAULT '#439d2a',
       secondary_color TEXT NOT NULL DEFAULT '#525252',
-      logo_img '69da57ca1fc90133789ea748db46a383'
+      logo_img TEXT NOT NULL DEFAULT '69da57ca1fc90133789ea748db46a383'
     )`, (err) => {
     if (err) {
       console.error('Error creating design_settings table:', err.message);

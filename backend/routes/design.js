@@ -4,9 +4,6 @@ const db = require('../db/db');
 const { requireRole } = require('../middleware/auth');
 const multer = require('multer');
 
-// Configure multer to store files (adjust as needed)
-const upload = multer({ dest: 'uploads/' });
-
 // Get design settings
 router.get('/', (_req, res) => { // Prefix unused 'req' with underscore
   console.log('GET /api/design received');
@@ -23,12 +20,12 @@ router.get('/', (_req, res) => { // Prefix unused 'req' with underscore
 });
 
 // Update design settings
-router.put('/', requireRole(['admin']), upload.single('file'), (req, res) => {
+router.put('/', requireRole(['admin']), (req, res) => {
   console.log('PUT /api/design received:', req.body, req.file);
   const { header_text, primary_color, secondary_color, logo_img } = req.body;
   
   // Check if at least one parameter is provided
-  if (!header_text && !primary_color && !secondary_color && !logo_img && !req.file) {
+  if (!header_text && !primary_color && !secondary_color && !req.file) {
     return res.status(400).json({ error: 'At least one parameter must be provided' });
   }
   
